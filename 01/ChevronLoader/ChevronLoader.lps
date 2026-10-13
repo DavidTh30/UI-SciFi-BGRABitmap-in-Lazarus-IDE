@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="12"/>
+    <BuildModes Active="Release"/>
+    <Units>
+      <Unit>
+        <Filename Value="ChevronLoader.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <UsageCount Value="20"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uchevronloader.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UChevronLoader"/>
+        <IsVisibleTab Value="True"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\shared\hudcore.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="HUDCore"/>
+        <UsageCount Value="20"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\shared\hudhost.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="HUDHost"/>
+        <UsageCount Value="20"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="-1"/>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>
