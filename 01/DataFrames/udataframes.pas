@@ -84,12 +84,12 @@ end;
 
 function TDataFramesWidget.Scan: single;
 begin
-  Result := Frac(T * FScanSpeed);
+  Result := Frac(Phase(0, FScanSpeed));
 end;
 
 function TDataFramesWidget.StatusLit: integer;
 begin
-  Result := Trunc(T * FStatusRate) mod 5;
+  Result := Trunc(Phase(1, FStatusRate)) mod 5;
 end;
 
 procedure TDataFramesWidget.DrawStatic;
@@ -152,7 +152,7 @@ var
 begin
   s := Scan;
   Line(AX + 6, P1 + 20 + s * 46, AX + 106, P1 + 20 + s * 46, 1, Ice(Round(160 * (1 - s))));
-  Ring(AX + 56, P3 + 32, 10 + 3 * Sin(T * FPulseRate), 0.8, Ice(120));
+  Ring(AX + 56, P3 + 32, 10 + 3 * Sin(Phase(2, FPulseRate)), 0.8, Ice(120));
   for i := 0 to StatusLit do
     Disc(AX + 8 + i * 6, P4 + 58, 1.5, White);
 end;
@@ -201,7 +201,7 @@ procedure TDataFramesWidget.DescribeLive(L: TStrings);
 begin
   inherited DescribeLive(L);
   L.Add(Format('Scan position       %.0f %%', [Scan * 100]));
-  L.Add(Format('Target ring radius  %.1f', [10 + 3 * Sin(T * FPulseRate)]));
+  L.Add(Format('Target ring radius  %.1f', [10 + 3 * Sin(Phase(2, FPulseRate))]));
   L.Add(Format('Status dots lit     %d / 5', [StatusLit + 1]));
 end;
 

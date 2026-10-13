@@ -20,7 +20,9 @@ type
     FSpeed: single;
     FManual: single;
     FBlocks: single;     // number of blocks
+    FCaption: string;    // label text, default LOADING...
     function Progress: single;
+    procedure SetCaption(const AValue: string);
     function BlockPitch: single;
   protected
     procedure DrawStatic; override;
@@ -33,6 +35,7 @@ type
     class function UnitFile: string; override;
     procedure DescribeAnatomy(L: TStrings); override;
     procedure DescribeLive(L: TStrings); override;
+    property Caption: string read FCaption write SetCaption;
   end;
 
 implementation
@@ -51,6 +54,7 @@ constructor TBlockLoaderWidget.Create;
 begin
   inherited Create;
   SetView(ViewW, ViewH);
+  FCaption := 'LOADING...';
   FAuto := 1;
   FSpeed := 0.07;
   FManual := 50;
@@ -63,6 +67,8 @@ begin
     FSpeed, 0, 2, 3, False);
   AddParam('Block count', 'Style', 'Number of blocks in the row (they share 182 units).',
     FBlocks, 4, 40, 0, True);
+  AddTextParam('Label text', 'Content', 'Text of the label (e.g. the name of the value shown).',
+    FCaption, True);
 end;
 
 class function TBlockLoaderWidget.UIName: string;
@@ -81,10 +87,17 @@ begin
   Result := 'BlockLoader\ublockloader.pas';
 end;
 
+procedure TBlockLoaderWidget.SetCaption(const AValue: string);
+begin
+  if FCaption = AValue then Exit;
+  FCaption := AValue;
+  InvalidateStatic;  // the label is part of the static cache
+end;
+
 function TBlockLoaderWidget.Progress: single;
 begin
   if FAuto >= 1 then
-    Result := Frac(StartAt + T * FSpeed)
+    Result := Frac(StartAt + Phase(0, FSpeed))
   else
     Result := FManual / 100;
 end;
@@ -103,7 +116,7 @@ begin
   Ticks(GX, AY, 24, 30, TickCount, -90, 270, 0.8, Steel(200));
   Ring(GX, AY, 22, 1, Ice(150));
   Ring(GX, AY, 33, 1.5, Ice(180));
-  Txt(BlocksL, AY - 18, 'LOADING...', 7, White(220));
+  Txt(BlocksL, AY - 18, FCaption, 7, White(220));
   Line(140, AY - 18, 270, AY - 18, 1, Ice(150));
   bw := BlockPitch * 0.7;
   for i := 0 to Round(FBlocks) - 1 do

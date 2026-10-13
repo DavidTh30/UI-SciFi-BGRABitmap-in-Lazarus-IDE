@@ -77,7 +77,7 @@ end;
 
 function THexCoreWidget.Pulse: single;
 begin
-  Result := 0.5 + 0.5 * Sin(T * FPulseRate);
+  Result := 0.5 + 0.5 * Sin(Phase(0, FPulseRate));
 end;
 
 procedure THexCoreWidget.DrawStatic;

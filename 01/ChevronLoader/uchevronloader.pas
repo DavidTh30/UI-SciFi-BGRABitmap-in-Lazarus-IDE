@@ -20,7 +20,9 @@ type
     FSpeed: single;      // cycles per second in auto mode
     FManual: single;     // progress in percent in manual mode
     FCount: single;      // number of chevrons
+    FCaption: string;    // label text, default LOADING...
     function Progress: single;
+    procedure SetCaption(const AValue: string);
   protected
     procedure DrawStatic; override;
     procedure DrawDynamic; override;
@@ -32,6 +34,7 @@ type
     class function UnitFile: string; override;
     procedure DescribeAnatomy(L: TStrings); override;
     procedure DescribeLive(L: TStrings); override;
+    property Caption: string read FCaption write SetCaption;
   end;
 
 implementation
@@ -49,6 +52,7 @@ constructor TChevronLoaderWidget.Create;
 begin
   inherited Create;
   SetView(ViewW, ViewH);
+  FCaption := 'LOADING...';
   FAuto := 1;
   FSpeed := 0.06;
   FManual := 65;
@@ -61,6 +65,8 @@ begin
     FSpeed, 0, 2, 3, False);
   AddParam('Chevron count', 'Style', 'Number of chevrons in the bar (spacing 12 units).',
     FCount, 1, 15, 0, True);
+  AddTextParam('Label text', 'Content', 'Text of the label (e.g. the name of the value shown).',
+    FCaption, True);
 end;
 
 class function TChevronLoaderWidget.UIName: string;
@@ -79,10 +85,17 @@ begin
   Result := 'ChevronLoader\uchevronloader.pas';
 end;
 
+procedure TChevronLoaderWidget.SetCaption(const AValue: string);
+begin
+  if FCaption = AValue then Exit;
+  FCaption := AValue;
+  InvalidateStatic;  // the label is part of the static cache
+end;
+
 function TChevronLoaderWidget.Progress: single;
 begin
   if FAuto >= 1 then
-    Result := Frac(StartAt + T * FSpeed)
+    Result := Frac(StartAt + Phase(0, FSpeed))
   else
     Result := FManual / 100;
 end;
@@ -106,7 +119,7 @@ begin
     FillPoly([bx, AY - 11, bx + 6, AY - 11, bx + 13, AY, bx + 6, AY + 11, bx, AY + 11, bx + 7, AY],
       Steel(110));
   end;
-  Txt(BarL + 2, AY + 28, 'LOADING...', 7, White(220));
+  Txt(BarL + 2, AY + 28, FCaption, 7, White(220));
 end;
 
 procedure TChevronLoaderWidget.DrawDynamic;
