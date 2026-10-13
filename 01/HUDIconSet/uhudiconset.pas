@@ -70,7 +70,7 @@ end;
 
 function THUDIconSetWidget.Blink: single;
 begin
-  Result := 0.55 + 0.45 * Cos(T * FBlinkRate * 2 * Pi);
+  Result := 0.55 + 0.45 * Cos(Phase(0, FBlinkRate * 2 * Pi));
 end;
 
 procedure THUDIconSetWidget.DrawWarnings(alpha: byte);
