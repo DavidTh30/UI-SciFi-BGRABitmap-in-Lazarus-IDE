@@ -1,0 +1,39 @@
+Hint: (11030) Start of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
+Hint: (11031) End of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
+Free Pascal Compiler version 3.2.2 [2024/05/25] for x86_64
+Copyright (c) 1993-2021 by Florian Klaempfl and others
+(1002) Target OS: Win64 for x64
+(3104) Compiling HUDRadarDefense.lpr
+(3104) Compiling F:\Claude\Lazarus\UI01\shared\hudhost.pas
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(35,31) Hint: (5024) Parameter "DC" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(350,3) Note: (5025) Local variable "i" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(85,28) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(82,29) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(82,46) Hint: (5024) Parameter "aCol" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(84,27) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(84,44) Hint: (5024) Parameter "aCol" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(84,69) Hint: (5024) Parameter "CanSelect" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(76,26) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(77,25) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(78,27) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(79,26) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(80,26) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(81,29) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(81,46) Hint: (5024) Parameter "Button" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(81,68) Hint: (5024) Parameter "Shift" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(86,27) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(86,59) Hint: (5024) Parameter "Shift" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(75,29) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(87,28) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\shared\hudhost.pas(74,23) Hint: (5024) Parameter "Sender" not used
+(3104) Compiling uhudradardefense.pas
+F:\Claude\Lazarus\UI01\HUDRadarDefense\uhudradardefense.pas(833,20) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDRadarDefense\uhudradardefense.pas(833,37) Hint: (5024) Parameter "Shift" not used
+F:\Claude\Lazarus\UI01\HUDRadarDefense\uhudradardefense.pas(834,20) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDRadarDefense\uhudradardefense.pas(834,59) Hint: (5024) Parameter "Shift" not used
+F:\Claude\Lazarus\UI01\HUDRadarDefense\HUDRadarDefense.lpr(14,10) Hint: (5023) Unit "HUDCore" not used in HUDRadarDefense
+(9022) Compiling resource F:\Claude\Lazarus\UI01\HUDRadarDefense\lib\x86_64-win64\HUDRadarDefense.obj
+(9015) Linking F:\Claude\Lazarus\UI01\HUDRadarDefense\HUDRadarDefense.exe
+(1008) 1889 lines compiled, 1.4 sec, 3125408 bytes code, 152212 bytes data
+(1022) 27 hint(s) issued
+(1023) 1 note(s) issued
