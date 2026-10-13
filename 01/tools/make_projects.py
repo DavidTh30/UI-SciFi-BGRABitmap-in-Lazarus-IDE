@@ -28,6 +28,15 @@ KITS = [
     ("SciFiHUDKit",     "USciFiHUDKit",     "TSciFiHUDKitWidget",     "Sci-Fi HUD Kit"),
     ("HUDSystemMonitor", "UHUDSystemMonitor", "THUDSystemMonitorWidget", "HUD System Monitor"),
     ("HUDDesigner",     "UHUDDesigner",     "THUDDesignWidget",       "HUD Designer"),
+    ("HUDRadarDefense", "UHUDRadarDefense", "THUDRadarDefenseWidget", "HUD Radar Defense"),
+    ("HUDChart",        "UHUDChart",        "THUDChartWidget",        "HUD Chart"),
+    ("HUDClock",        "UHUDClock",        "THUDClockWidget",        "HUD Clock"),
+    ("HUDFileBrowser",  "UHUDFileBrowser",  "THUDFileBrowserWidget",  "HUD File Browser"),
+    ("HUDNote",         "UHUDNote",         "THUDNoteWidget",         "HUD Note"),
+    ("HUDMediaPlayer",  "UHUDMediaPlayer",  "THUDMediaPlayerWidget",  "HUD Media Player"),
+    ("HUDCalculator",   "UHUDCalculator",   "THUDCalculatorWidget",   "HUD Calculator"),
+    ("HUDWeather",      "UHUDWeather",      "THUDWeatherWidget",      "HUD Weather"),
+    ("HUDTranslator",   "UHUDTranslator",   "THUDTranslatorWidget",   "HUD Translator"),
 ]
 
 LPR = """program {prog};
