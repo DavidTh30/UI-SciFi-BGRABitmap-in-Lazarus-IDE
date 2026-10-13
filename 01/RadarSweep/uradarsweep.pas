@@ -79,7 +79,7 @@ end;
 
 function TRadarSweepWidget.Beam: single;
 begin
-  Result := T * FSweepSpeed;
+  Result := Phase(0, FSweepSpeed);
 end;
 
 function TRadarSweepWidget.BlipLevel(bx, by: single): single;

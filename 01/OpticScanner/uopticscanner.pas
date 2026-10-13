@@ -26,7 +26,7 @@ type
     function CY: single; inline;
     function Rot: single;
   protected
-    procedure DrawBackground(B: TBGRABitmap); override;
+    procedure DrawBackgroundExtras(B: TBGRABitmap); override;
     procedure DrawStatic; override;
     procedure DrawDynamic; override;
     procedure DefineDirty; override;
@@ -94,12 +94,11 @@ end;
 
 function TOpticScannerWidget.Rot: single;
 begin
-  Result := T * FRotSpeed;
+  Result := Phase(0, FRotSpeed);
 end;
 
-procedure TOpticScannerWidget.DrawBackground(B: TBGRABitmap);
+procedure TOpticScannerWidget.DrawBackgroundExtras(B: TBGRABitmap);
 begin
-  inherited DrawBackground(B);
   // soft white halos behind the lens shells
   SoftDisc(B, CX - 130, CY, 70, White(150));
   SoftDisc(B, CX + 130, CY, 70, White(130));
@@ -155,7 +154,7 @@ procedure TOpticScannerWidget.DescribeAnatomy(L: TStrings);
 begin
   L.Add('Center (CX, CY) = (210, 145) in a 420 x 290 view. r = radius.');
   L.Add('');
-  L.Add('BACKGROUND (DrawBackground)');
+  L.Add('BACKGROUND (DrawBackgroundExtras)');
   L.Add('  Soft halos      White a150 r70 at CX-130, White a130 r70 at CX+130, Ice a40 r140 at center');
   L.Add('');
   L.Add('STATIC (DrawStatic)');

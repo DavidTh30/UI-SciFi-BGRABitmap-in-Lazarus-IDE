@@ -1,48 +1,12 @@
+Hint: (lazarus) Build Project: nothing to do.
 Hint: (11030) Start of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
 Hint: (11031) End of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
 Free Pascal Compiler version 3.2.2 [2024/05/25] for x86_64
 Copyright (c) 1993-2021 by Florian Klaempfl and others
 (1002) Target OS: Win64 for x64
 (3104) Compiling SciFiHUDKit.lpr
-(3104) Compiling F:\Claude\Lazarus\UI01\shared\hudcore.pas
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(258,28) Hint: (5057) Local variable "c" does not seem to be initialized
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(259,30) Hint: (5057) Local variable "f" does not seem to be initialized
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(159,29) Hint: (5024) Parameter "id" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(159,42) Hint: (5024) Parameter "cx" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(159,46) Hint: (5024) Parameter "cy" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(159,50) Hint: (5024) Parameter "a" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(153,36) Hint: (5024) Parameter "B" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(100,44) Hint: (5024) Parameter "Data" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(100,59) Hint: (5024) Parameter "Item" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(101,39) Hint: (5024) Parameter "Data" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(101,54) Hint: (5024) Parameter "Item" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(102,39) Hint: (5024) Parameter "Data" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(102,54) Hint: (5024) Parameter "Item" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(103,41) Hint: (5024) Parameter "Data" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(103,56) Hint: (5024) Parameter "Item" not used
-(3104) Compiling F:\Claude\Lazarus\UI01\shared\hudhost.pas
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(33,31) Hint: (5024) Parameter "DC" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(80,28) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(77,29) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(77,46) Hint: (5024) Parameter "aCol" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(79,27) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(79,44) Hint: (5024) Parameter "aCol" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(79,69) Hint: (5024) Parameter "CanSelect" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(71,26) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(72,25) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(73,27) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(74,26) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(75,26) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(76,29) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(76,46) Hint: (5024) Parameter "Button" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(76,68) Hint: (5024) Parameter "Shift" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(81,27) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(81,59) Hint: (5024) Parameter "Shift" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(70,29) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(83,28) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(69,23) Hint: (5024) Parameter "Sender" not used
 F:\Claude\Lazarus\UI01\SciFiHUDKit\SciFiHUDKit.lpr(14,10) Hint: (5023) Unit "HUDCore" not used in SciFiHUDKit
 (9022) Compiling resource F:\Claude\Lazarus\UI01\SciFiHUDKit\lib\x86_64-win64\SciFiHUDKit.obj
 (9015) Linking F:\Claude\Lazarus\UI01\SciFiHUDKit\SciFiHUDKit.exe
-(1008) 2296 lines compiled, 1.3 sec, 3134368 bytes code, 152068 bytes data
-(1022) 38 hint(s) issued
+(1008) 21 lines compiled, 1.3 sec, 3138336 bytes code, 152084 bytes data
+(1022) 3 hint(s) issued

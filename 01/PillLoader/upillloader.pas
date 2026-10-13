@@ -20,7 +20,9 @@ type
     FSpeed: single;
     FManual: single;
     FDots: single;       // dots around the gauge
+    FCaption: string;    // label text, default LOADING...
     function Progress: single;
+    procedure SetCaption(const AValue: string);
     function DotPos(i, n: integer; out dx, dy: single): boolean;
   protected
     procedure DrawStatic; override;
@@ -33,6 +35,7 @@ type
     class function UnitFile: string; override;
     procedure DescribeAnatomy(L: TStrings); override;
     procedure DescribeLive(L: TStrings); override;
+    property Caption: string read FCaption write SetCaption;
   end;
 
 implementation
@@ -52,6 +55,7 @@ constructor TPillLoaderWidget.Create;
 begin
   inherited Create;
   SetView(ViewW, ViewH);
+  FCaption := 'LOADING...';
   FAuto := 1;
   FSpeed := 0.05;
   FManual := 85;
@@ -64,6 +68,8 @@ begin
     FSpeed, 0, 2, 3, False);
   AddParam('Gauge dots', 'Style', 'Number of dots around the gauge.',
     FDots, 6, 60, 0, True);
+  AddTextParam('Label text', 'Content', 'Text of the label (e.g. the name of the value shown).',
+    FCaption, True);
 end;
 
 class function TPillLoaderWidget.UIName: string;
@@ -82,10 +88,17 @@ begin
   Result := 'PillLoader\upillloader.pas';
 end;
 
+procedure TPillLoaderWidget.SetCaption(const AValue: string);
+begin
+  if FCaption = AValue then Exit;
+  FCaption := AValue;
+  InvalidateStatic;  // the label is part of the static cache
+end;
+
 function TPillLoaderWidget.Progress: single;
 begin
   if FAuto >= 1 then
-    Result := Frac(StartAt + T * FSpeed)
+    Result := Frac(StartAt + Phase(0, FSpeed))
   else
     Result := FManual / 100;
 end;
@@ -119,7 +132,7 @@ begin
   // pill track
   FFill.FillRoundRectAntialias(X(PillL), Y(AY - 9), X(PillR), Y(AY + 9), 9 * K, 9 * K, Navy(230));
   FLayer.RoundRectAntialias(X(PillL), Y(AY - 9), X(PillR), Y(AY + 9), 9 * K, 9 * K, Steel(150), 1 * K);
-  Txt(PillL, AY + 18, 'LOADING...', 7, White(220));
+  Txt(PillL, AY + 18, FCaption, 7, White(220));
 end;
 
 procedure TPillLoaderWidget.DrawDynamic;
