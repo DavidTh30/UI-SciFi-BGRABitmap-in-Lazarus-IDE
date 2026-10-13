@@ -167,6 +167,7 @@ type
     procedure DrawRingShape(id: integer; cx, cy, a: single); virtual;
   public
     Prof: array[0..3] of double;  // ms: draw dynamic, downsample, blur, compose
+    TextFont: string;              // font of Txt / TxtCached (default Consolas)
     ProfFrames: integer;
 
     constructor Create; virtual;
@@ -479,7 +480,7 @@ end;
 procedure THUDWidget.Txt(ax, ay: single; const S: string; size: single;
   c: TBGRAPixel; align: TAlignment);
 begin
-  FLayer.FontName := 'Consolas';
+  FLayer.FontName := TextFont;
   FLayer.FontStyle := [fsBold];
   FLayer.FontQuality := fqFineAntialiasing;
   FLayer.FontHeight := Max(6, Round(size * K));
@@ -500,14 +501,14 @@ var
   key: string;
 begin
   // text rasterization is slow; render each distinct string once per size
-  key := S + '|' + FloatToStr(size) + '|' + IntToHex(c.red, 2) + IntToHex(c.green, 2) +
+  key := S + '|' + TextFont + '|' + FloatToStr(size) + '|' + IntToHex(c.red, 2) + IntToHex(c.green, 2) +
     IntToHex(c.blue, 2) + IntToHex(c.alpha, 2);
   idx := FTextCache.IndexOf(key);
   if idx < 0 then
   begin
     if FTextCache.Count >= 512 then FTextCache.Clear;  // live texts: keep it bounded
     B := TBGRABitmap.Create(1, 1);
-    B.FontName := 'Consolas';
+    B.FontName := TextFont;
     B.FontStyle := [fsBold];
     B.FontQuality := fqFineAntialiasing;
     B.FontHeight := Max(6, Round(size * K));
@@ -752,6 +753,7 @@ begin
   FTextCache := TStringList.Create;
   FTextCache.OwnsObjects := True;
   FTextCache.Sorted := True;
+  TextFont := 'Consolas';
   FViewW := 300;
   FViewH := 300;
   FGlowGain := 1.3;
