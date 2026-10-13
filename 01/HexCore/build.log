@@ -1,0 +1,26 @@
+Hint: (11030) Start of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
+Hint: (11031) End of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
+Free Pascal Compiler version 3.2.2 [2024/05/25] for x86_64
+Copyright (c) 1993-2021 by Florian Klaempfl and others
+(1002) Target OS: Win64 for x64
+(3104) Compiling HexCore.lpr
+(3104) Compiling F:\Claude\Lazarus\UI01\shared\hudcore.pas
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(214,28) Hint: (5057) Local variable "c" does not seem to be initialized
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(215,30) Hint: (5057) Local variable "f" does not seem to be initialized
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(152,29) Hint: (5024) Parameter "id" not used
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(152,42) Hint: (5024) Parameter "cx" not used
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(152,46) Hint: (5024) Parameter "cy" not used
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(152,50) Hint: (5024) Parameter "a" not used
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(96,44) Hint: (5024) Parameter "Data" not used
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(96,59) Hint: (5024) Parameter "Item" not used
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(97,39) Hint: (5024) Parameter "Data" not used
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(97,54) Hint: (5024) Parameter "Item" not used
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(98,39) Hint: (5024) Parameter "Data" not used
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(98,54) Hint: (5024) Parameter "Item" not used
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(99,41) Hint: (5024) Parameter "Data" not used
+F:\Claude\Lazarus\UI01\shared\hudcore.pas(99,56) Hint: (5024) Parameter "Item" not used
+F:\Claude\Lazarus\UI01\HexCore\HexCore.lpr(14,10) Hint: (5023) Unit "HUDCore" not used in HexCore
+(9022) Compiling resource F:\Claude\Lazarus\UI01\HexCore\lib\x86_64-win64\HexCore.obj
+(9015) Linking F:\Claude\Lazarus\UI01\HexCore\HexCore.exe
+(1008) 1153 lines compiled, 1.3 sec, 3078448 bytes code, 152036 bytes data
+(1022) 17 hint(s) issued
