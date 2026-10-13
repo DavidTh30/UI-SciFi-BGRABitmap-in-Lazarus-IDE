@@ -1,0 +1,19 @@
+Hint: (11030) Start of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
+Hint: (11031) End of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
+Free Pascal Compiler version 3.2.2 [2024/05/25] for x86_64
+Copyright (c) 1993-2021 by Florian Klaempfl and others
+(1002) Target OS: Win64 for x64
+(3104) Compiling HUDSystemMonitor.lpr
+(3104) Compiling uhudsystemmonitor.pas
+(3104) Compiling usysmonitor.pas
+F:\Claude\Lazarus\UI01\HUDSystemMonitor\usysmonitor.pas(132,19) Hint: (5057) Local variable "si" does not seem to be initialized
+F:\Claude\Lazarus\UI01\HUDSystemMonitor\usysmonitor.pas(142,35) Hint: (5057) Local variable "fu" does not seem to be initialized
+F:\Claude\Lazarus\UI01\HUDSystemMonitor\usysmonitor.pas(142,31) Hint: (5057) Local variable "fk" does not seem to be initialized
+F:\Claude\Lazarus\UI01\HUDSystemMonitor\usysmonitor.pas(142,27) Hint: (5057) Local variable "fi" does not seem to be initialized
+F:\Claude\Lazarus\UI01\HUDSystemMonitor\usysmonitor.pas(159,14) Hint: (5057) Local variable "ms" does not seem to be initialized
+F:\Claude\Lazarus\UI01\HUDSystemMonitor\usysmonitor.pas(250,48) Hint: (5057) Local variable "needed" does not seem to be initialized
+F:\Claude\Lazarus\UI01\HUDSystemMonitor\HUDSystemMonitor.lpr(14,10) Hint: (5023) Unit "HUDCore" not used in HUDSystemMonitor
+(9022) Compiling resource F:\Claude\Lazarus\UI01\HUDSystemMonitor\lib\x86_64-win64\HUDSystemMonitor.obj
+(9015) Linking F:\Claude\Lazarus\UI01\HUDSystemMonitor\HUDSystemMonitor.exe
+(1008) 793 lines compiled, 1.4 sec, 3143008 bytes code, 152260 bytes data
+(1022) 9 hint(s) issued
