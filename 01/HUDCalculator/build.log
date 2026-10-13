@@ -1,68 +1,12 @@
+Hint: (lazarus) Build Project: nothing to do.
 Hint: (11030) Start of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
 Hint: (11031) End of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
 Free Pascal Compiler version 3.2.2 [2024/05/25] for x86_64
 Copyright (c) 1993-2021 by Florian Klaempfl and others
 (1002) Target OS: Win64 for x64
 (3104) Compiling HUDCalculator.lpr
-(3104) Compiling F:\Claude\Lazarus\UI01\shared\hudcore.pas
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(275,28) Hint: (5057) Local variable "c" does not seem to be initialized
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(276,30) Hint: (5057) Local variable "f" does not seem to be initialized
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(167,29) Hint: (5024) Parameter "id" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(167,42) Hint: (5024) Parameter "cx" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(167,46) Hint: (5024) Parameter "cy" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(167,50) Hint: (5024) Parameter "a" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(161,36) Hint: (5024) Parameter "B" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(103,44) Hint: (5024) Parameter "Data" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(103,59) Hint: (5024) Parameter "Item" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(104,39) Hint: (5024) Parameter "Data" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(104,54) Hint: (5024) Parameter "Item" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(105,39) Hint: (5024) Parameter "Data" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(105,54) Hint: (5024) Parameter "Item" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(106,41) Hint: (5024) Parameter "Data" not used
-F:\Claude\Lazarus\UI01\shared\hudcore.pas(106,56) Hint: (5024) Parameter "Item" not used
-(3104) Compiling F:\Claude\Lazarus\UI01\shared\hudhost.pas
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(35,31) Hint: (5024) Parameter "DC" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(356,3) Note: (5025) Local variable "i" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(90,28) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(87,29) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(87,46) Hint: (5024) Parameter "aCol" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(89,27) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(89,44) Hint: (5024) Parameter "aCol" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(89,69) Hint: (5024) Parameter "CanSelect" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(81,26) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(82,25) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(83,27) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(84,26) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(85,26) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(86,29) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(86,46) Hint: (5024) Parameter "Button" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(86,68) Hint: (5024) Parameter "Shift" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(91,27) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(91,59) Hint: (5024) Parameter "Shift" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(80,29) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(92,28) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\shared\hudhost.pas(79,23) Hint: (5024) Parameter "Sender" not used
-(3104) Compiling uhudcalculator.pas
-(3104) Compiling F:\Claude\Lazarus\UI01\shared\hudpanels.pas
-(3104) Compiling F:\Claude\Lazarus\UI01\HexCore\uhexcore.pas
-(3104) Compiling ucalcengine.pas
-F:\Claude\Lazarus\UI01\HUDCalculator\ucalcengine.pas(6,21) Warning: (2005) Comment level 2 found
-F:\Claude\Lazarus\UI01\HUDCalculator\ucalcengine.pas(7,22) Warning: (2005) Comment level 2 found
-F:\Claude\Lazarus\UI01\HUDCalculator\ucalcengine.pas(10,24) Warning: (2005) Comment level 2 found
-F:\Claude\Lazarus\UI01\HUDCalculator\uhudcalculator.pas(749,20) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDCalculator\uhudcalculator.pas(749,37) Hint: (5024) Parameter "Shift" not used
-F:\Claude\Lazarus\UI01\HUDCalculator\uhudcalculator.pas(750,20) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDCalculator\uhudcalculator.pas(750,59) Hint: (5024) Parameter "Shift" not used
-F:\Claude\Lazarus\UI01\HUDCalculator\uhudcalculator.pas(751,21) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDCalculator\uhudcalculator.pas(751,38) Hint: (5024) Parameter "Shift" not used
-F:\Claude\Lazarus\UI01\HUDCalculator\uhudcalculator.pas(754,24) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDCalculator\uhudcalculator.pas(755,25) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDCalculator\uhudcalculator.pas(756,33) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDCalculator\uhudcalculator.pas(745,5) Note: (5029) Private field "TCalcInput.FOldKeyPress" is never used
 F:\Claude\Lazarus\UI01\HUDCalculator\HUDCalculator.lpr(14,10) Hint: (5023) Unit "HUDCore" not used in HUDCalculator
 (9022) Compiling resource F:\Claude\Lazarus\UI01\HUDCalculator\lib\x86_64-win64\HUDCalculator.obj
 (9015) Linking F:\Claude\Lazarus\UI01\HUDCalculator\HUDCalculator.exe
-(1008) 4392 lines compiled, 1.4 sec, 3119888 bytes code, 153988 bytes data
-(1021) 3 warning(s) issued
-(1022) 47 hint(s) issued
-(1023) 2 note(s) issued
+(1008) 21 lines compiled, 1.3 sec, 3119952 bytes code, 153988 bytes data
+(1022) 3 hint(s) issued

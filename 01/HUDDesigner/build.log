@@ -1,28 +1,12 @@
+Hint: (lazarus) Build Project: nothing to do.
 Hint: (11030) Start of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
 Hint: (11031) End of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
 Free Pascal Compiler version 3.2.2 [2024/05/25] for x86_64
 Copyright (c) 1993-2021 by Florian Klaempfl and others
 (1002) Target OS: Win64 for x64
 (3104) Compiling HUDDesigner.lpr
-(3104) Compiling uhuddesigner.pas
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(509,24) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(510,27) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(511,30) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(512,24) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(513,27) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(514,25) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(515,25) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(516,27) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(517,24) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(517,63) Hint: (5024) Parameter "Shift" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(518,24) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(519,22) Hint: (5024) Parameter "Sender" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(519,39) Hint: (5024) Parameter "Button" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(519,61) Hint: (5024) Parameter "Shift" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(519,81) Hint: (5024) Parameter "X" not used
-F:\Claude\Lazarus\UI01\HUDDesigner\uhuddesigner.pas(519,84) Hint: (5024) Parameter "Y" not used
 F:\Claude\Lazarus\UI01\HUDDesigner\HUDDesigner.lpr(14,10) Hint: (5023) Unit "HUDCore" not used in HUDDesigner
 (9022) Compiling resource F:\Claude\Lazarus\UI01\HUDDesigner\lib\x86_64-win64\HUDDesigner.obj
 (9015) Linking F:\Claude\Lazarus\UI01\HUDDesigner\HUDDesigner.exe
-(1008) 894 lines compiled, 1.4 sec, 3200528 bytes code, 152900 bytes data
-(1022) 19 hint(s) issued
+(1008) 21 lines compiled, 1.3 sec, 3201712 bytes code, 152900 bytes data
+(1022) 3 hint(s) issued
