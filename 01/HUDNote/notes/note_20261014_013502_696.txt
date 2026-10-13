@@ -1,0 +1,4 @@
+Welcome to HUD Note
+
+Type here. Notes save automatically one second after you stop typing.
+The first line is the title shown in the list.

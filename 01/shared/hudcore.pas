@@ -9,6 +9,9 @@ unit HUDCore;
     DefineDirty                - AddDirty() rects that contain ALL dynamic parts
     DescribeAnatomy / DescribeLive / UIName / UIDescription - info panel
 
+  THUDComposite hosts several widgets on one canvas: each child keeps its own
+  code and parameters but draws into the composite's layers at an origin.
+
   Coordinates are design units inside the widget viewport (SetView), scaled
   to fit the window. Angles are degrees, clockwise from 3 o'clock.
 
@@ -47,7 +50,9 @@ type
 
   THUDParam = record
     Name, Group, Hint: string;
-    Value: PSingle;
+    Value: PSingle;              // numeric parameter (nil for text)
+    TextValue: PString;          // text parameter (nil for numeric)
+    DefText: string;
     MinV, MaxV, DefV: single;
     Decimals: integer;           // 0 = integer / on-off value
     AffectsStatic: boolean;      // True = static cache is rebuilt on change
@@ -87,6 +92,8 @@ type
     FSmallRects: array of TRect;
     FRBase, FRDst, FRLayer, FRFill, FRSmall, FRBlur, FRTmp, FBlurSrc, FBlurDst: TPixRows;
     FProfiling: boolean;
+    FHosted: boolean;         // drawn by a THUDComposite
+    FPhases: array of record P, LastT: double; end;
 
     procedure Rebuild(W, H: integer);
     procedure BuildDirtyRects;
@@ -134,18 +141,26 @@ type
     procedure FillPoly(const A: array of single; c: TBGRAPixel);
     procedure Txt(ax, ay: single; const S: string; size: single; c: TBGRAPixel;
       align: TAlignment = taLeftJustify);
-    procedure TxtCached(ax, ay: single; const S: string; size: single; align: TAlignment);
+    procedure TxtCached(ax, ay: single; const S: string; size: single; align: TAlignment); overload;
+    procedure TxtCached(ax, ay: single; const S: string; size: single; align: TAlignment;
+      c: TBGRAPixel); overload;
 
     { widget definition helpers }
     procedure SetView(AW, AH: single);
     procedure AddParam(const AName, AGroup, AHint: string; var AValue: single;
       AMin, AMax: single; ADecimals: integer; AStatic: boolean);
+    procedure AddTextParam(const AName, AGroup, AHint: string; var AValue: string;
+      AStatic: boolean);
     procedure AddDirty(x1, y1, x2, y2: single);
     procedure RegisterRing(id: integer; ARadius, APeriod: single; AOnFill: boolean);
     procedure RingFrame(id: integer; cx, cy, angle: single);
+    function Phase(slot: integer; rate: single): double;
 
     { to implement / override }
     procedure DrawBackground(B: TBGRABitmap); virtual;
+    procedure DrawBackgroundExtras(B: TBGRABitmap); virtual;  // halos etc. on top
+    procedure OnRebuild; virtual;           // static cache is about to be rebuilt
+    function NeedsRebuild: boolean; virtual;
     procedure DrawStatic; virtual; abstract;
     procedure DrawDynamic; virtual; abstract;
     procedure DefineDirty; virtual;
@@ -167,9 +182,17 @@ type
     procedure InvalidateStatic;
     procedure ResetParams;
     procedure SetParamValue(i: integer; v: single);
+    function ParamIndex(const AName: string): integer;
+    procedure SetParamText(i: integer; const v: string);
+    procedure SetTextParamByName(const AName, v: string);
+    function ParamIsText(i: integer): boolean;
+    function ParamAsText(i: integer): string;      // value formatted for display/files
+    procedure SetParamByName(const AName: string; v: single);
     function ParamCount: integer;
     function DirtyCount: integer;
     function DirtyRect(i: integer): TRect;
+    function PixelToDesign(px, py: single): TPointF;  // window pixel -> design units
+    function DesignToPixel(dx, dy: single): TPointF;  // design units -> window pixel
 
     property Params[i: integer]: THUDParam read GetParam;
     property Output: TBGRABitmap read FOut;
@@ -185,9 +208,47 @@ type
     property DesignHeight: single read FViewH;
     property TimeScale: single read FTimeScale;
     property RingFramesCached: integer read GetRingFramesCached;
+    property Hosted: boolean read FHosted;    // True inside a THUDComposite
   end;
 
   THUDWidgetClass = class of THUDWidget;
+
+  THUDChild = record
+    W: THUDWidget;
+    OX0, OY0: single;   // origin of the child view in composite design units
+    Caption: string;
+  end;
+
+  { THUDComposite - several widgets on one canvas, one glow pipeline }
+
+  THUDComposite = class(THUDWidget)
+  private
+    FChildren: array of THUDChild;
+    FSelected: integer;
+    procedure SyncChild(i: integer);
+    function GetChild(i: integer): THUDWidget;
+  protected
+    function AddChild(AWidget: THUDWidget; AOriginX, AOriginY: single;
+      const ALabel: string = ''): integer;
+    procedure DrawBackgroundExtras(B: TBGRABitmap); override;
+    procedure DrawStatic; override;
+    procedure DrawDynamic; override;
+    procedure DefineDirty; override;
+    procedure OnRebuild; override;
+    function NeedsRebuild: boolean; override;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    function ChildCount: integer;
+    function ChildCaption(i: integer): string;
+    function ChildOrigin(i: integer): TPointF;
+    function ChildPixelRect(i: integer): TRect;   // in the last rendered frame
+    function ChildAt(px, py: integer): integer;    // -1 = none
+    procedure RemoveChild(i: integer);
+    procedure SetChildOrigin(i: integer; AX, AY: single);
+    procedure SetChildCaption(i: integer; const ACaption: string);
+    property Children[i: integer]: THUDWidget read GetChild;
+  end;
 
 { shared palette }
 function White(a: byte = 255): TBGRAPixel;
@@ -426,6 +487,12 @@ begin
 end;
 
 procedure THUDWidget.TxtCached(ax, ay: single; const S: string; size: single; align: TAlignment);
+begin
+  TxtCached(ax, ay, S, size, align, White);
+end;
+
+procedure THUDWidget.TxtCached(ax, ay: single; const S: string; size: single; align: TAlignment;
+  c: TBGRAPixel);
 var
   idx, px: integer;
   B: TBGRABitmap;
@@ -433,10 +500,12 @@ var
   key: string;
 begin
   // text rasterization is slow; render each distinct string once per size
-  key := S + '|' + FloatToStr(size);
+  key := S + '|' + FloatToStr(size) + '|' + IntToHex(c.red, 2) + IntToHex(c.green, 2) +
+    IntToHex(c.blue, 2) + IntToHex(c.alpha, 2);
   idx := FTextCache.IndexOf(key);
   if idx < 0 then
   begin
+    if FTextCache.Count >= 512 then FTextCache.Clear;  // live texts: keep it bounded
     B := TBGRABitmap.Create(1, 1);
     B.FontName := 'Consolas';
     B.FontStyle := [fsBold];
@@ -445,7 +514,7 @@ begin
     sz := B.TextSize(S);
     B.SetSize(sz.cx + 2, sz.cy + 2);
     B.FillTransparent;
-    B.TextOut(1, 1, S, White);
+    B.TextOut(1, 1, S, c);
     idx := FTextCache.AddObject(key, B);
   end;
   B := TBGRABitmap(FTextCache.Objects[idx]);
@@ -484,6 +553,25 @@ begin
     MaxV := AMax;
     DefV := AValue;
     Decimals := ADecimals;
+    AffectsStatic := AStatic;
+  end;
+end;
+
+procedure THUDWidget.AddTextParam(const AName, AGroup, AHint: string; var AValue: string;
+  AStatic: boolean);
+var
+  n: integer;
+begin
+  n := Length(FParams);
+  SetLength(FParams, n + 1);
+  with FParams[n] do
+  begin
+    Name := AName;
+    Group := AGroup;
+    Hint := AHint;
+    Value := nil;
+    TextValue := @AValue;
+    DefText := AValue;
     AffectsStatic := AStatic;
   end;
 end;
@@ -548,6 +636,20 @@ begin
   end;
 end;
 
+function THUDWidget.Phase(slot: integer; rate: single): double;
+begin
+  // integral of rate over the animation time: rate can change at any moment
+  // (parameter edit, live data) without the animation jumping
+  if slot >= Length(FPhases) then SetLength(FPhases, slot + 1);
+  with FPhases[slot] do
+  begin
+    if T < LastT then P := T * rate          // clock restarted
+    else P := P + (T - LastT) * rate;
+    LastT := T;
+    Result := P;
+  end;
+end;
+
 procedure THUDWidget.DrawRingShape(id: integer; cx, cy, a: single);
 begin
   // override when RegisterRing is used
@@ -574,6 +676,10 @@ begin
   for i := 0 to High(FRings) do
     for j := 0 to High(FRings[i].Frames) do
       if FRings[i].Frames[j] <> nil then Inc(Result);
+  if Self is THUDComposite then
+    with THUDComposite(Self) do
+      for i := 0 to ChildCount - 1 do
+        Inc(Result, Children[i].RingFramesCached);
 end;
 
 procedure THUDWidget.DrawBackground(B: TBGRABitmap);
@@ -593,6 +699,39 @@ begin
     B.DrawLineAntialias(X(i * 16), 0, X(i * 16), B.Height, BGRA(120, 170, 220, 10), 1);
   for i := Floor(-OY / (16 * K)) to Ceil((B.Height - OY) / (16 * K)) do
     B.DrawLineAntialias(0, Y(i * 16), B.Width, Y(i * 16), BGRA(120, 170, 220, 10), 1);
+  DrawBackgroundExtras(B);
+end;
+
+procedure THUDWidget.DrawBackgroundExtras(B: TBGRABitmap);
+begin
+  // override to add halos behind the widget
+end;
+
+procedure THUDWidget.OnRebuild;
+begin
+end;
+
+function THUDWidget.NeedsRebuild: boolean;
+begin
+  Result := FStaticDirty;
+end;
+
+function THUDWidget.ParamIndex(const AName: string): integer;
+begin
+  for Result := 0 to High(FParams) do
+    if SameText(FParams[Result].Name, AName) then Exit;
+  Result := -1;
+end;
+
+procedure THUDWidget.SetParamByName(const AName: string; v: single);
+var
+  i: integer;
+begin
+  i := ParamIndex(AName);
+  if (i < 0) or (FParams[i].Value = nil) then
+    raise Exception.CreateFmt('%s has no numeric parameter "%s"', [ClassName, AName]);
+  SetParamValue(i, v);
+  FParams[i].DefV := FParams[i].Value^;  // becomes the reset value too
 end;
 
 procedure THUDWidget.DefineDirty;
@@ -652,7 +791,10 @@ var
   i: integer;
 begin
   for i := 0 to High(FParams) do
-    FParams[i].Value^ := FParams[i].DefV;
+    if FParams[i].TextValue <> nil then
+      FParams[i].TextValue^ := FParams[i].DefText
+    else
+      FParams[i].Value^ := FParams[i].DefV;
   FStaticDirty := True;
 end;
 
@@ -660,12 +802,54 @@ procedure THUDWidget.SetParamValue(i: integer; v: single);
 begin
   with FParams[i] do
   begin
+    if Value = nil then Exit;  // text parameter
     v := EnsureRange(v, MinV, MaxV);
     if Decimals = 0 then v := Round(v);
     if Value^ = v then Exit;
     Value^ := v;
     if AffectsStatic then FStaticDirty := True;
   end;
+end;
+
+procedure THUDWidget.SetParamText(i: integer; const v: string);
+begin
+  with FParams[i] do
+  begin
+    if (TextValue = nil) or (TextValue^ = v) then Exit;
+    TextValue^ := v;
+    if AffectsStatic then FStaticDirty := True;
+  end;
+end;
+
+procedure THUDWidget.SetTextParamByName(const AName, v: string);
+var
+  i: integer;
+begin
+  i := ParamIndex(AName);
+  if (i < 0) or (FParams[i].TextValue = nil) then
+    raise Exception.CreateFmt('%s has no text parameter "%s"', [ClassName, AName]);
+  SetParamText(i, v);
+  FParams[i].DefText := v;
+end;
+
+function THUDWidget.ParamIsText(i: integer): boolean;
+begin
+  Result := FParams[i].TextValue <> nil;
+end;
+
+function THUDWidget.ParamAsText(i: integer): string;
+var
+  fs: TFormatSettings;
+begin
+  with FParams[i] do
+    if TextValue <> nil then
+      Result := TextValue^
+    else
+    begin
+      fs := DefaultFormatSettings;
+      fs.DecimalSeparator := '.';
+      Result := FloatToStrF(Value^, ffFixed, 15, Decimals, fs);
+    end;
 end;
 
 function THUDWidget.ParamCount: integer;
@@ -676,6 +860,18 @@ end;
 function THUDWidget.GetParam(i: integer): THUDParam;
 begin
   Result := FParams[i];
+end;
+
+function THUDWidget.PixelToDesign(px, py: single): TPointF;
+begin
+  // inverse of X()/Y() for the last rendered frame
+  if K <= 0 then Exit(PointF(0, 0));
+  Result := PointF((px - OX) / K, (py - OY) / K);
+end;
+
+function THUDWidget.DesignToPixel(dx, dy: single): TPointF;
+begin
+  Result := PointF(X(dx), Y(dy));
 end;
 
 function THUDWidget.DirtyCount: integer;
@@ -1071,6 +1267,7 @@ begin
   FreeAndNil(FStaticOut);
   FTextCache.Clear;
   FreeRings;
+  OnRebuild;
   FBack := TBGRABitmap.Create(W, H);
   DrawBackground(FBack);
   FLayer := TBGRABitmap.Create(W, H);
@@ -1117,7 +1314,7 @@ begin
   K := Min(Min(W / FViewW, H / FViewH), FMaxZoom);
   OX := (W - FViewW * K) / 2;
   OY := (H - FViewH * K) / 2;
-  if FStaticDirty or (FOut = nil) or (FW <> W) or (FH <> H) then
+  if NeedsRebuild or (FOut = nil) or (FW <> W) or (FH <> H) then
     Rebuild(W, H);
   if Length(FDirty) = 0 then Exit;  // fully static widget
   // compose of the previous frame left the dirty rects of FLayer / FFill
@@ -1127,6 +1324,209 @@ begin
   Prof[0] += NowMs - t0;
   Compose(FStaticOut, FOut, FDirty);
   Inc(ProfFrames);
+end;
+
+{ ---------- THUDComposite ---------- }
+
+constructor THUDComposite.Create;
+begin
+  inherited Create;
+  FSelected := -1;
+end;
+
+destructor THUDComposite.Destroy;
+var
+  i: integer;
+begin
+  for i := 0 to High(FChildren) do
+  begin
+    // the layers belong to the composite (SyncChild), not to the child
+    FChildren[i].W.FLayer := nil;
+    FChildren[i].W.FFill := nil;
+    FChildren[i].W.Free;
+  end;
+  inherited Destroy;
+end;
+
+function THUDComposite.AddChild(AWidget: THUDWidget; AOriginX, AOriginY: single;
+  const ALabel: string): integer;
+begin
+  Result := Length(FChildren);
+  SetLength(FChildren, Result + 1);
+  FChildren[Result].W := AWidget;
+  FChildren[Result].OX0 := AOriginX;
+  FChildren[Result].OY0 := AOriginY;
+  if ALabel <> '' then
+    FChildren[Result].Caption := ALabel
+  else
+    FChildren[Result].Caption := AWidget.UIName;
+  AWidget.FHosted := True;
+  FStaticDirty := True;
+end;
+
+procedure THUDComposite.SyncChild(i: integer);
+begin
+  // the child draws straight into our layers with our transform + its origin
+  with FChildren[i] do
+  begin
+    W.FLayer := FLayer;
+    W.FFill := FFill;
+    W.K := K;
+    W.OX := OX + OX0 * K;
+    W.OY := OY + OY0 * K;
+    W.T := T;
+    W.FDrawingStatic := FDrawingStatic;
+  end;
+end;
+
+function THUDComposite.NeedsRebuild: boolean;
+var
+  i: integer;
+begin
+  Result := inherited NeedsRebuild;
+  for i := 0 to High(FChildren) do
+    if FChildren[i].W.FStaticDirty then Exit(True);
+end;
+
+procedure THUDComposite.OnRebuild;
+var
+  i: integer;
+begin
+  // cached ring frames and texts depend on the scale
+  for i := 0 to High(FChildren) do
+  begin
+    FChildren[i].W.FreeRings;
+    FChildren[i].W.FTextCache.Clear;
+    FChildren[i].W.FStaticDirty := False;
+  end;
+end;
+
+procedure THUDComposite.DrawBackgroundExtras(B: TBGRABitmap);
+var
+  i: integer;
+begin
+  for i := 0 to High(FChildren) do
+  begin
+    SyncChild(i);
+    FChildren[i].W.DrawBackgroundExtras(B);
+  end;
+end;
+
+procedure THUDComposite.DrawStatic;
+var
+  i: integer;
+begin
+  for i := 0 to High(FChildren) do
+  begin
+    SyncChild(i);
+    FChildren[i].W.DrawStatic;
+  end;
+end;
+
+procedure THUDComposite.DrawDynamic;
+var
+  i: integer;
+begin
+  for i := 0 to High(FChildren) do
+  begin
+    SyncChild(i);
+    FChildren[i].W.DrawDynamic;
+  end;
+end;
+
+procedure THUDComposite.DefineDirty;
+var
+  i, j: integer;
+  R: TRectF;
+begin
+  for i := 0 to High(FChildren) do
+    with FChildren[i] do
+    begin
+      W.FDirtyDesign := nil;
+      W.DefineDirty;
+      for j := 0 to High(W.FDirtyDesign) do
+      begin
+        R := W.FDirtyDesign[j];
+        AddDirty(R.Left + OX0, R.Top + OY0, R.Right + OX0, R.Bottom + OY0);
+      end;
+    end;
+end;
+
+function THUDComposite.ChildCount: integer;
+begin
+  Result := Length(FChildren);
+end;
+
+function THUDComposite.GetChild(i: integer): THUDWidget;
+begin
+  Result := FChildren[i].W;
+end;
+
+function THUDComposite.ChildCaption(i: integer): string;
+begin
+  Result := FChildren[i].Caption;
+end;
+
+function THUDComposite.ChildOrigin(i: integer): TPointF;
+begin
+  Result := PointF(FChildren[i].OX0, FChildren[i].OY0);
+end;
+
+function THUDComposite.ChildPixelRect(i: integer): TRect;
+begin
+  with FChildren[i] do
+    Result := Rect(Round(X(OX0)), Round(Y(OY0)),
+      Round(X(OX0 + W.DesignWidth)), Round(Y(OY0 + W.DesignHeight)));
+end;
+
+function THUDComposite.ChildAt(px, py: integer): integer;
+var
+  i: integer;
+  best: double;
+  R: TRect;
+  d: double;
+begin
+  // several views overlap: pick the one whose centre is closest
+  Result := -1;
+  best := MaxDouble;
+  for i := 0 to High(FChildren) do
+  begin
+    R := ChildPixelRect(i);
+    if (px >= R.Left) and (px < R.Right) and (py >= R.Top) and (py < R.Bottom) then
+    begin
+      d := Sqr(px - (R.Left + R.Right) / 2) + Sqr(py - (R.Top + R.Bottom) / 2);
+      if d < best then
+      begin
+        best := d;
+        Result := i;
+      end;
+    end;
+  end;
+end;
+
+procedure THUDComposite.RemoveChild(i: integer);
+var
+  j: integer;
+begin
+  FChildren[i].W.FLayer := nil;   // layers belong to the composite
+  FChildren[i].W.FFill := nil;
+  FChildren[i].W.Free;
+  for j := i to High(FChildren) - 1 do
+    FChildren[j] := FChildren[j + 1];
+  SetLength(FChildren, Length(FChildren) - 1);
+  FStaticDirty := True;
+end;
+
+procedure THUDComposite.SetChildOrigin(i: integer; AX, AY: single);
+begin
+  FChildren[i].OX0 := AX;
+  FChildren[i].OY0 := AY;
+  FStaticDirty := True;
+end;
+
+procedure THUDComposite.SetChildCaption(i: integer; const ACaption: string);
+begin
+  FChildren[i].Caption := ACaption;
 end;
 
 end.

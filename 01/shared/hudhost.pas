@@ -27,18 +27,31 @@ type
   public
     AnimTime: single;
     ShowDirty: boolean;
+    Highlight: integer;      // composite child to outline, -1 = none
+    DragRect: TRect;         // dashed outline while dragging (designer)
+    ShowDrag: boolean;
     Frames: integer;         // painted frames (FPS counter)
     constructor Create(AOwner: TComponent; AWidget: THUDWidget); reintroduce;
     procedure EraseBackground(DC: HDC); override;
     procedure Paint; override;
     procedure RequestFrame(ForceFull: boolean);
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseLeave;
+    property OnMouseWheel;
+    property OnDblClick;
+  public
+    OnAfterPaint: TNotifyEvent;   // e.g. to place LCL controls over HUD frames
   end;
 
   { THUDHostForm }
 
   THUDHostForm = class(TForm)
   private
-    FWidget: THUDWidget;
+    FWidget: THUDWidget;     // what is rendered
+    FInfoW: THUDWidget;      // what the info panel describes (FWidget or a child)
+    FSelect: TComboBox;      // composite only: pick the UI to inspect
     FView: THUDView;
     FInfo: TPanel;
     FTitle, FDesc, FStatus, FParamHint: TLabel;
@@ -76,10 +89,30 @@ type
     procedure ParamSelect(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
     procedure PalettePaint(Sender: TObject);
     procedure HostKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure SelectChange(Sender: TObject);
+    function IsComposite: boolean;
+    procedure ApplyCommandLineParams;
   public
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
+    { API for programs that extend the window (see HostSetupProc) }
+    procedure SelectInfo(AChild: integer);   // -1 = the whole widget
+    procedure RefreshSelector;               // after children were added/removed
+    procedure RefreshInfo;                   // after parameters changed in code
+    procedure RequestFullRepaint;
+    procedure SetStatus(const AText: string);
+    property Widget: THUDWidget read FWidget;
+    property InfoWidget: THUDWidget read FInfoW;
+    property View: THUDView read FView;
+    property InfoPanel: TPanel read FInfo;
   end;
+
+  THostSetupProc = procedure(AForm: THUDHostForm);
+
+var
+  { set (e.g. in a unit's initialization) to add controls / behaviour to the
+    window; called once after the standard UI is built }
+  HostSetupProc: THostSetupProc = nil;
 
 procedure RunHUDWidget(AClass: THUDWidgetClass);
 
@@ -116,6 +149,7 @@ begin
   FWidget := AWidget;
   TabStop := True;
   DoubleBuffered := False;
+  Highlight := -1;
 end;
 
 procedure THUDView.EraseBackground(DC: HDC);
@@ -129,7 +163,7 @@ var
   R: TRect;
 begin
   if not HandleAllocated then Exit;
-  if ForceFull or ShowDirty or (FWidget.Output = nil) or
+  if ForceFull or ShowDirty or ShowDrag or (Highlight >= 0) or (FWidget.Output = nil) or
      (ClientWidth <> FLastW) or (ClientHeight <> FLastH) then
   begin
     FPartial := False;
@@ -194,9 +228,32 @@ begin
     Canvas.Font.Size := 8;
     Canvas.TextOut(6, 4, Format('%d dirty rect(s), %d px', [FWidget.DirtyCount, FWidget.DirtyArea]));
   end;
+  if (Highlight >= 0) and (FWidget is THUDComposite) then
+    with THUDComposite(FWidget) do
+    begin
+      // outline of the selected UI (its design view)
+      R := ChildPixelRect(Highlight);
+      Canvas.Brush.Style := bsClear;
+      Canvas.Pen.Color := RGBToColor(80, 220, 255);
+      Canvas.Pen.Style := psDot;
+      Canvas.Rectangle(R);
+      Canvas.Pen.Style := psSolid;
+      Canvas.Font.Color := RGBToColor(80, 220, 255);
+      Canvas.Font.Size := 8;
+      Canvas.TextOut(R.Left + 3, R.Top + 2, ChildCaption(Highlight));
+    end;
+  if ShowDrag then
+  begin
+    Canvas.Brush.Style := bsClear;
+    Canvas.Pen.Color := clYellow;
+    Canvas.Pen.Style := psDash;
+    Canvas.Rectangle(DragRect);
+    Canvas.Pen.Style := psSolid;
+  end;
   FLastW := ClientWidth;
   FLastH := ClientHeight;
   Inc(Frames);
+  if Assigned(OnAfterPaint) then OnAfterPaint(Self);
 end;
 
 { ---------- THUDHostForm: construction ---------- }
@@ -207,6 +264,7 @@ var
 begin
   inherited Create(TheOwner);   // no .lfm: the whole UI is built in code
   FWidget := HostWidgetClass.Create;
+  FInfoW := FWidget;
   Caption := FWidget.UIName + '  -  Sci-Fi HUD (BGRABitmap)';
   Width := 1260;
   Height := 760;
@@ -214,6 +272,9 @@ begin
   KeyPreview := True;
   OnKeyDown := @HostKeyDown;
   BuildUI;
+  if Assigned(HostSetupProc) then
+    HostSetupProc(Self);
+  ApplyCommandLineParams;
   {$IFDEF WINDOWS}
   timeBeginPeriod(1); // Sleep(1) really sleeps ~1 ms
   {$ENDIF}
@@ -292,6 +353,7 @@ end;
 
 procedure THUDHostForm.BuildUI;
 var
+  i: integer;
   Head: TPanel;
   Bar: TFlowPanel;
   Split: TSplitter;
@@ -355,11 +417,25 @@ begin
   FChkCap.Checked := True;
   FChkCap.BorderSpacing.Around := 4;
 
+  if IsComposite then
+  begin
+    FSelect := TComboBox.Create(Self);
+    FSelect.Parent := FInfo;
+    FSelect.Align := alTop;
+    FSelect.Top := 400;
+    FSelect.Style := csDropDownList;
+    FSelect.BorderSpacing.Around := 6;
+    FSelect.OnChange := @SelectChange;
+    RefreshSelector;
+  end;
+
   FStatus := TLabel.Create(Self);
   FStatus.Parent := FInfo;
   FStatus.Align := alBottom;
   FStatus.BorderSpacing.Around := 4;
   FStatus.Caption := 'Space: pause   S: screenshot   D: dirty rects   V: fps cap   Esc: exit';
+  if IsComposite then
+    FStatus.Caption := FStatus.Caption + LineEnding + 'Click a UI in the view to inspect it.';
 
   FPages := TPageControl.Create(Self);
   FPages.Parent := FInfo;
@@ -428,16 +504,20 @@ begin
   exe := ExtractFileName(Application.ExeName);
   L := TStringList.Create;
   try
-    L.Add('UI NAME        ' + FWidget.UIName);
+    L.Add('UI NAME        ' + FInfoW.UIName);
     L.Add('Program        ' + exe);
-    L.Add('Widget class   ' + FWidget.ClassName);
-    L.Add('Widget unit    ' + FWidget.UnitFile);
+    if FInfoW.Hosted then
+      with THUDComposite(FWidget).ChildOrigin(FSelect.ItemIndex - 1) do
+        L.Add(Format('Hosted         in %s at canvas origin (%.0f, %.0f); own program: %s.exe',
+          [FWidget.UIName, x, y, StringReplace(FInfoW.UIName, ' ', '', [rfReplaceAll])]));
+    L.Add('Widget class   ' + FInfoW.ClassName);
+    L.Add('Widget unit    ' + FInfoW.UnitFile);
     L.Add('Shared units   shared\hudcore.pas (engine), shared\hudhost.pas (this window)');
     L.Add(Format('Design view    %s x %s design units (scaled to fit, max zoom %s)',
-      [FloatStr(FWidget.DesignWidth, 0), FloatStr(FWidget.DesignHeight, 0), FloatStr(FWidget.Params[2].Value^, 1)]));
+      [FloatStr(FInfoW.DesignWidth, 0), FloatStr(FInfoW.DesignHeight, 0), FloatStr(FWidget.Params[FWidget.ParamIndex('Max zoom')].Value^, 1)]));
     L.Add('');
     L.Add('DESCRIPTION');
-    L.Add('  ' + FWidget.UIDescription);
+    L.Add('  ' + FInfoW.UIDescription);
     L.Add('');
     L.Add('COORDINATES');
     L.Add('  Units are design units inside the view (origin top-left).');
@@ -454,7 +534,7 @@ begin
     L.Add('  Strokes go to FLayer (glow). Colors with alpha < 200 or dark');
     L.Add('  colors are routed to FFill (no glow) by THUDWidget.Dest().');
     L.Add('');
-    L.Add('HOW TO EXTEND THIS UI (' + FWidget.UnitFile + ')');
+    L.Add('HOW TO EXTEND THIS UI (' + FInfoW.UnitFile + ')');
     L.Add('  constructor Create   SetView(w, h); AddParam(...); RegisterRing(...)');
     L.Add('  DrawStatic           add non-moving elements here (cheap: cached)');
     L.Add('  DrawDynamic          add moving elements here (cost: every frame)');
@@ -471,6 +551,7 @@ begin
     L.Add('  Space pause   S screenshot   D dirty rects   V 60 fps cap   Esc exit');
     L.Add('  ' + exe + ' --shot out.png [W H]   render one frame and quit');
     L.Add('  ' + exe + ' --info out.txt         export this info and quit');
+    L.Add('  ' + exe + ' --set "Name=Value"     preset a parameter (repeatable)');
     FOverview.Lines.Assign(L);
   finally
     L.Free;
@@ -479,8 +560,7 @@ end;
 
 function THUDHostForm.ParamText(i: integer): string;
 begin
-  with FWidget.Params[i] do
-    Result := FloatStr(Value^, Decimals);
+  Result := FInfoW.ParamAsText(i);
 end;
 
 function THUDHostForm.ParamOfRow(aRow: integer): integer;
@@ -491,8 +571,8 @@ begin
   Result := -1;
   if (aRow < 1) or (aRow >= FParamGrid.RowCount) then Exit;
   key := FParamGrid.Keys[aRow];
-  for Result := 0 to FWidget.ParamCount - 1 do
-    if FWidget.Params[Result].Name = key then Exit;
+  for Result := 0 to FInfoW.ParamCount - 1 do
+    if FInfoW.Params[Result].Name = key then Exit;
   Result := -1;
 end;
 
@@ -503,8 +583,9 @@ begin
   FParamGrid.Strings.BeginUpdate;
   try
     FParamGrid.Strings.Clear;
-    for i := 0 to FWidget.ParamCount - 1 do
-      FParamGrid.Strings.Add(FWidget.Params[i].Name + '=' + ParamText(i));
+    for i := 0 to FInfoW.ParamCount - 1 do
+      if not (FInfoW.Hosted and (FInfoW.Params[i].Group = 'Engine')) then
+        FParamGrid.Strings.Add(FInfoW.Params[i].Name + '=' + ParamText(i));
   finally
     FParamGrid.Strings.EndUpdate;
   end;
@@ -516,7 +597,7 @@ var
 begin
   L := TStringList.Create;
   try
-    FWidget.DescribeAnatomy(L);
+    FInfoW.DescribeAnatomy(L);
     FAnatomy.Lines.Assign(L);
   finally
     L.Free;
@@ -567,7 +648,9 @@ begin
     L.Add(Format('  Ring frames cached  %d', [FWidget.RingFramesCached]));
     L.Add('');
     L.Add('STATE');
-    FWidget.DescribeLive(L);
+    if FInfoW <> FWidget then
+      L.Add('[' + FInfoW.UIName + ']');
+    FInfoW.DescribeLive(L);
     FLive.Lines.Assign(L);
   finally
     L.Free;
@@ -586,14 +669,18 @@ begin
     L.AddStrings(FOverview.Lines);
     L.Add('');
     L.Add('PARAMETERS');
-    for i := 0 to FWidget.ParamCount - 1 do
-      with FWidget.Params[i] do
+    for i := 0 to FInfoW.ParamCount - 1 do
+      if FInfoW.ParamIsText(i) then
+        with FInfoW.Params[i] do
+          L.Add(Format('  %-26s %10s  text, default "%s"  (%s) %s', [Name, '"' + ParamText(i) + '"', DefText, Group, Hint]))
+      else
+      with FInfoW.Params[i] do
         L.Add(Format('  %-26s %10s  [%s .. %s] default %s  (%s%s) %s',
           [Name, ParamText(i), FloatStr(MinV, Decimals), FloatStr(MaxV, Decimals),
            FloatStr(DefV, Decimals), Group, BoolToStr(AffectsStatic, ', rebuilds cache', ''), Hint]));
     L.Add('');
     L.Add('ANATOMY');
-    FWidget.DescribeAnatomy(A);
+    FInfoW.DescribeAnatomy(A);
     L.AddStrings(A);
     L.Add('');
     L.Add('PALETTE');
@@ -660,6 +747,12 @@ var
 begin
   i := ParamOfRow(aRow);
   if i < 0 then Exit;
+  if FInfoW.ParamIsText(i) then
+  begin
+    FInfoW.SetParamText(i, NewValue);
+    FForceFull := True;
+    Exit;
+  end;
   fs := DefaultFormatSettings;
   fs.DecimalSeparator := '.';
   if not TryStrToFloat(StringReplace(Trim(NewValue), ',', '.', []), v, fs) then
@@ -667,7 +760,7 @@ begin
     NewValue := OldValue;
     Exit;
   end;
-  FWidget.SetParamValue(i, v);
+  FInfoW.SetParamValue(i, v);
   NewValue := ParamText(i);   // clamped / rounded value
   FForceFull := True;
 end;
@@ -678,7 +771,14 @@ var
 begin
   i := ParamOfRow(aRow);
   if i < 0 then Exit;
-  with FWidget.Params[i] do
+  if FInfoW.ParamIsText(i) then
+    with FInfoW.Params[i] do
+    begin
+      FParamHint.Caption := Format('%s  (%s, text)'#10'%s'#10'Default "%s"%s',
+        [Name, Group, Hint, DefText, BoolToStr(AffectsStatic, ' - changing it rebuilds the static cache', '')]);
+      Exit;
+    end;
+  with FInfoW.Params[i] do
     FParamHint.Caption := Format('%s  (%s)'#10'%s'#10'Range %s .. %s, default %s%s',
       [Name, Group, Hint, FloatStr(MinV, Decimals), FloatStr(MaxV, Decimals),
        FloatStr(DefV, Decimals), BoolToStr(AffectsStatic, ' - changing it rebuilds the static cache', '')]);
@@ -704,7 +804,7 @@ procedure THUDHostForm.ExportClick(Sender: TObject);
 var
   fn: string;
 begin
-  fn := ExtractFilePath(Application.ExeName) + StringReplace(FWidget.UIName, ' ', '', [rfReplaceAll]) + '_info.txt';
+  fn := ExtractFilePath(Application.ExeName) + StringReplace(FInfoW.UIName, ' ', '', [rfReplaceAll]) + '_info.txt';
   with TStringList.Create do
   try
     Text := InfoText;
@@ -718,7 +818,7 @@ end;
 
 procedure THUDHostForm.ResetClick(Sender: TObject);
 begin
-  FWidget.ResetParams;
+  FInfoW.ResetParams;
   FillParams;
   FForceFull := True;
 end;
@@ -733,6 +833,8 @@ procedure THUDHostForm.ViewMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   FView.SetFocus;
+  if IsComposite then
+    SelectInfo(THUDComposite(FWidget).ChildAt(X, Y));
 end;
 
 procedure THUDHostForm.HostKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -765,6 +867,106 @@ begin
   end;
   if FPages.ActivePage.Caption = 'Live' then
     UpdateLive;
+end;
+
+function THUDHostForm.IsComposite: boolean;
+begin
+  Result := FWidget is THUDComposite;
+end;
+
+procedure THUDHostForm.SelectInfo(AChild: integer);
+begin
+  // AChild = -1: the whole composite, else one hosted UI
+  if AChild >= 0 then
+    FInfoW := THUDComposite(FWidget).Children[AChild]
+  else
+    FInfoW := FWidget;
+  if FSelect <> nil then
+  begin
+    if FSelect.Items.Count <> THUDComposite(FWidget).ChildCount + 1 then RefreshSelector;
+    FSelect.ItemIndex := AChild + 1;
+  end;
+  FView.Highlight := AChild;
+  FTitle.Caption := FInfoW.UIName;
+  FDesc.Caption := FInfoW.UIDescription;
+  FParamHint.Caption := 'Select a parameter to see its description. Edit the value and press Enter.';
+  FillOverview;
+  FillParams;
+  FillAnatomy;
+  UpdateLive;
+  FForceFull := True;
+end;
+
+procedure THUDHostForm.ApplyCommandLineParams;
+var
+  i, p: integer;
+  nm, v: string;
+  d: double;
+  fs: TFormatSettings;
+begin
+  // <program>.exe --set "Name=Value" [--set ...] : preset parameters of the main widget
+  fs := DefaultFormatSettings;
+  fs.DecimalSeparator := '.';
+  i := 1;
+  while i < ParamCount do
+  begin
+    if ParamStr(i) = '--set' then
+    begin
+      nm := Copy(ParamStr(i + 1), 1, Pos('=', ParamStr(i + 1)) - 1);
+      v := Copy(ParamStr(i + 1), Pos('=', ParamStr(i + 1)) + 1, MaxInt);
+      p := FWidget.ParamIndex(nm);
+      if p >= 0 then
+        if FWidget.ParamIsText(p) then FWidget.SetParamText(p, v)
+        else if TryStrToFloat(v, d, fs) then FWidget.SetParamValue(p, d);
+      Inc(i);
+    end;
+    Inc(i);
+  end;
+  FillParams;
+end;
+
+procedure THUDHostForm.RefreshSelector;
+var
+  i, keep: integer;
+begin
+  if FSelect = nil then Exit;
+  keep := FSelect.ItemIndex;
+  FSelect.Items.BeginUpdate;
+  try
+    FSelect.Items.Clear;
+    FSelect.Items.Add('Whole canvas - ' + FWidget.UIName);
+    for i := 0 to THUDComposite(FWidget).ChildCount - 1 do
+      FSelect.Items.Add(THUDComposite(FWidget).ChildCaption(i));
+  finally
+    FSelect.Items.EndUpdate;
+  end;
+  if (keep < 0) or (keep >= FSelect.Items.Count) then keep := 0;
+  FSelect.ItemIndex := keep;
+end;
+
+procedure THUDHostForm.RefreshInfo;
+begin
+  FTitle.Caption := FInfoW.UIName;
+  FDesc.Caption := FInfoW.UIDescription;
+  FillOverview;
+  FillParams;
+  FillAnatomy;
+  UpdateLive;
+end;
+
+procedure THUDHostForm.RequestFullRepaint;
+begin
+  FForceFull := True;
+end;
+
+procedure THUDHostForm.SetStatus(const AText: string);
+begin
+  FStatus.Caption := AText;
+end;
+
+procedure THUDHostForm.SelectChange(Sender: TObject);
+begin
+  SelectInfo(FSelect.ItemIndex - 1);
 end;
 
 procedure THUDHostForm.AppIdle(Sender: TObject; var Done: Boolean);

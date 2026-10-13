@@ -1,0 +1,12 @@
+Hint: (lazarus) Build Project: nothing to do.
+Hint: (11030) Start of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
+Hint: (11031) End of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
+Free Pascal Compiler version 3.2.2 [2024/05/25] for x86_64
+Copyright (c) 1993-2021 by Florian Klaempfl and others
+(1002) Target OS: Win64 for x64
+(3104) Compiling HUDNote.lpr
+F:\Claude\Lazarus\UI01\HUDNote\HUDNote.lpr(14,10) Hint: (5023) Unit "HUDCore" not used in HUDNote
+(9022) Compiling resource F:\Claude\Lazarus\UI01\HUDNote\lib\x86_64-win64\HUDNote.obj
+(9015) Linking F:\Claude\Lazarus\UI01\HUDNote\HUDNote.exe
+(1008) 21 lines compiled, 1.2 sec, 3138320 bytes code, 152164 bytes data
+(1022) 3 hint(s) issued

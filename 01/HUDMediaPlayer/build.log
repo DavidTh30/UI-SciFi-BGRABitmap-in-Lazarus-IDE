@@ -1,0 +1,25 @@
+Hint: (11030) Start of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
+Hint: (11031) End of reading config file C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.cfg
+Free Pascal Compiler version 3.2.2 [2024/05/25] for x86_64
+Copyright (c) 1993-2021 by Florian Klaempfl and others
+(1002) Target OS: Win64 for x64
+(3104) Compiling HUDMediaPlayer.lpr
+(3104) Compiling uhudmediaplayer.pas
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(956,20) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(957,20) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(958,20) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(958,59) Hint: (5024) Parameter "Shift" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(959,24) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(960,21) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(960,38) Hint: (5024) Parameter "Shift" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(963,20) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(964,26) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(965,29) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(966,30) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(967,27) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\uhudmediaplayer.pas(968,26) Hint: (5024) Parameter "Sender" not used
+F:\Claude\Lazarus\UI01\HUDMediaPlayer\HUDMediaPlayer.lpr(14,10) Hint: (5023) Unit "HUDCore" not used in HUDMediaPlayer
+(9022) Compiling resource F:\Claude\Lazarus\UI01\HUDMediaPlayer\lib\x86_64-win64\HUDMediaPlayer.obj
+(9015) Linking F:\Claude\Lazarus\UI01\HUDMediaPlayer\HUDMediaPlayer.exe
+(1008) 1272 lines compiled, 1.3 sec, 3154240 bytes code, 154564 bytes data
+(1022) 16 hint(s) issued
