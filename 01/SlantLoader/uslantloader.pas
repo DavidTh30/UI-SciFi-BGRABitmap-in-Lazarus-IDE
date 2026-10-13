@@ -20,7 +20,9 @@ type
     FSpeed: single;
     FManual: single;
     FSlant: single;      // horizontal offset of the wedge top edge
+    FCaption: string;    // label text, default LOADING...
     function Progress: single;
+    procedure SetCaption(const AValue: string);
   protected
     procedure DrawStatic; override;
     procedure DrawDynamic; override;
@@ -32,6 +34,7 @@ type
     class function UnitFile: string; override;
     procedure DescribeAnatomy(L: TStrings); override;
     procedure DescribeLive(L: TStrings); override;
+    property Caption: string read FCaption write SetCaption;
   end;
 
 implementation
@@ -49,6 +52,7 @@ constructor TSlantLoaderWidget.Create;
 begin
   inherited Create;
   SetView(ViewW, ViewH);
+  FCaption := 'LOADING...';
   FAuto := 1;
   FSpeed := 0.045;
   FManual := 75;
@@ -61,6 +65,8 @@ begin
     FSpeed, 0, 2, 3, False);
   AddParam('Slant', 'Style', 'Horizontal offset of the wedge top edge (0 = rectangle).',
     FSlant, 0, 30, 0, False);
+  AddTextParam('Label text', 'Content', 'Text of the label (e.g. the name of the value shown).',
+    FCaption, True);
 end;
 
 class function TSlantLoaderWidget.UIName: string;
@@ -79,10 +85,17 @@ begin
   Result := 'SlantLoader\uslantloader.pas';
 end;
 
+procedure TSlantLoaderWidget.SetCaption(const AValue: string);
+begin
+  if FCaption = AValue then Exit;
+  FCaption := AValue;
+  InvalidateStatic;  // the label is part of the static cache
+end;
+
 function TSlantLoaderWidget.Progress: single;
 begin
   if FAuto >= 1 then
-    Result := Frac(StartAt + T * FSpeed)
+    Result := Frac(StartAt + Phase(0, FSpeed))
   else
     Result := FManual / 100;
 end;
@@ -94,7 +107,7 @@ begin
   // slanted frame
   PolyLine([68, AY + 22, 100, AY - 16, 180, AY - 16, 190, AY - 24, 270, AY - 24], 1, Ice(180));
   PolyLine([68, AY + 22, 270, AY + 22], 1, Ice(180));
-  Txt(270, AY + 31, 'LOADING...', 7, White(220), taRightJustify);
+  Txt(270, AY + 31, FCaption, 7, White(220), taRightJustify);
 end;
 
 procedure TSlantLoaderWidget.DrawDynamic;

@@ -25,7 +25,7 @@ type
     function CY: single; inline;
     function Rot: single;
   protected
-    procedure DrawBackground(B: TBGRABitmap); override;
+    procedure DrawBackgroundExtras(B: TBGRABitmap); override;
     procedure DrawStatic; override;
     procedure DrawDynamic; override;
     procedure DefineDirty; override;
@@ -96,12 +96,11 @@ end;
 
 function TTargetLockWidget.Rot: single;
 begin
-  Result := -T * FRotSpeed;
+  Result := -Phase(0, FRotSpeed);
 end;
 
-procedure TTargetLockWidget.DrawBackground(B: TBGRABitmap);
+procedure TTargetLockWidget.DrawBackgroundExtras(B: TBGRABitmap);
 begin
-  inherited DrawBackground(B);
   SoftDisc(B, CX, CY, 140, Ice(30));
 end;
 

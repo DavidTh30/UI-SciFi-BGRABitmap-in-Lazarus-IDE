@@ -26,7 +26,7 @@ type
     function Rot: single;
     function Pulse: single;
   protected
-    procedure DrawBackground(B: TBGRABitmap); override;
+    procedure DrawBackgroundExtras(B: TBGRABitmap); override;
     procedure DrawStatic; override;
     procedure DrawDynamic; override;
     procedure DefineDirty; override;
@@ -94,17 +94,16 @@ end;
 
 function TShieldCoreWidget.Rot: single;
 begin
-  Result := T * FRotSpeed;
+  Result := Phase(0, FRotSpeed);
 end;
 
 function TShieldCoreWidget.Pulse: single;
 begin
-  Result := 0.5 + 0.5 * Sin(T * FPulseRate);
+  Result := 0.5 + 0.5 * Sin(Phase(1, FPulseRate));
 end;
 
-procedure TShieldCoreWidget.DrawBackground(B: TBGRABitmap);
+procedure TShieldCoreWidget.DrawBackgroundExtras(B: TBGRABitmap);
 begin
-  inherited DrawBackground(B);
   SoftDisc(B, CX, CY, 140, Ice(35));
 end;
 

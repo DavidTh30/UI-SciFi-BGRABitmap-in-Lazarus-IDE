@@ -75,7 +75,7 @@ end;
 
 function TTargetCrosshairWidget.SectorAngle: single;
 begin
-  Result := T * FSpinSpeed;
+  Result := Phase(0, FSpinSpeed);
 end;
 
 procedure TTargetCrosshairWidget.DrawStatic;
