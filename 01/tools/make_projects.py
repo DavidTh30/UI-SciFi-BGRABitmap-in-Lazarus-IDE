@@ -23,6 +23,13 @@ PROGRAMS = [
     ("SlantLoader",     "USlantLoader",     "TSlantLoaderWidget",     "Slant Loader"),
 ]
 
+# composite programs: they host the widgets above, so they need their folders
+KITS = [
+    ("SciFiHUDKit",     "USciFiHUDKit",     "TSciFiHUDKitWidget",     "Sci-Fi HUD Kit"),
+    ("HUDSystemMonitor", "UHUDSystemMonitor", "THUDSystemMonitorWidget", "HUD System Monitor"),
+    ("HUDDesigner",     "UHUDDesigner",     "THUDDesignWidget",       "HUD Designer"),
+]
+
 LPR = """program {prog};
 
 {{ {title} - Sci-Fi HUD program.
@@ -52,7 +59,7 @@ COMPILER = """      <Version Value="11"/>
       </Target>
       <SearchPaths>
         <IncludeFiles Value="$(ProjOutDir)"/>
-        <OtherUnitFiles Value="..\\shared"/>
+        <OtherUnitFiles Value="{paths}"/>
         <UnitOutputDirectory Value="lib\\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
 {extra}"""
@@ -178,28 +185,36 @@ def indent(text, n):
     return "".join(pad + line if line.strip() else line for line in text.splitlines(True))
 
 
+def write_program(prog, unit, cls, title, paths, build):
+    d = os.path.join(ROOT, prog)
+    os.makedirs(d, exist_ok=True)
+    unitlower = unit.lower()
+    unitfile = f"{prog}\\{unitlower}.pas"
+    with open(os.path.join(d, prog + ".lpr"), "w", encoding="utf-8", newline="\r\n") as f:
+        f.write(LPR.format(prog=prog, unit=unit, cls=cls, title=title, unitfile=unitfile))
+    release = COMPILER.format(prog=prog, extra=RELEASE, paths=paths)
+    debug = indent(COMPILER.format(prog=prog, extra=DEBUG, paths=paths), 4)
+    with open(os.path.join(d, prog + ".lpi"), "w", encoding="utf-8", newline="\r\n") as f:
+        f.write(LPI.format(prog=prog, title=title, unit=unit, unitlower=unitlower,
+                           release=release, debug=debug))
+    build.append(f"echo === {prog}")
+    build.append(f"%LAZBUILD% --bm=Release {prog}\\{prog}.lpi >{prog}\\build.log 2>&1 || "
+                 f"(echo FAILED: see {prog}\\build.log & set FAILED=1)")
+
+
 def main():
     build = ["@echo off", "rem Build every Sci-Fi HUD program (Release mode).",
              "set LAZBUILD=C:\\lazarus\\lazbuild.exe", "cd /d %~dp0", "set FAILED=0"]
     for prog, unit, cls, title in PROGRAMS:
-        d = os.path.join(ROOT, prog)
-        os.makedirs(d, exist_ok=True)
-        unitlower = unit.lower()
-        unitfile = f"{prog}\\{unitlower}.pas"
-        with open(os.path.join(d, prog + ".lpr"), "w", encoding="utf-8", newline="\r\n") as f:
-            f.write(LPR.format(prog=prog, unit=unit, cls=cls, title=title, unitfile=unitfile))
-        release = COMPILER.format(prog=prog, extra=RELEASE)
-        debug = indent(COMPILER.format(prog=prog, extra=DEBUG), 4)
-        with open(os.path.join(d, prog + ".lpi"), "w", encoding="utf-8", newline="\r\n") as f:
-            f.write(LPI.format(prog=prog, title=title, unit=unit, unitlower=unitlower,
-                               release=release, debug=debug))
-        build.append(f"echo === {prog}")
-        build.append(f"%LAZBUILD% --bm=Release {prog}\\{prog}.lpi >{prog}\\build.log 2>&1 || "
-                     f"(echo FAILED: see {prog}\\build.log & set FAILED=1)")
+        write_program(prog, unit, cls, title, "..\\shared", build)
+    # kits are built last: they reuse the widget units of every program
+    kit_paths = ";".join(["..\\shared"] + ["..\\" + p[0] for p in PROGRAMS])
+    for prog, unit, cls, title in KITS:
+        write_program(prog, unit, cls, title, kit_paths, build)
     build.append("if %FAILED%==1 (echo Some builds failed. & exit /b 1) else (echo All programs built.)")
     with open(os.path.join(ROOT, "build_all.cmd"), "w", encoding="utf-8", newline="\r\n") as f:
         f.write("\n".join(build) + "\n")
-    print("generated", len(PROGRAMS), "projects")
+    print("generated", len(PROGRAMS) + len(KITS), "projects")
 
 
 if __name__ == "__main__":
