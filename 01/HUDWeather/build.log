@@ -8,5 +8,5 @@ Copyright (c) 1993-2021 by Florian Klaempfl and others
 F:\Claude\Lazarus\UI01\HUDWeather\HUDWeather.lpr(14,10) Hint: (5023) Unit "HUDCore" not used in HUDWeather
 (9022) Compiling resource F:\Claude\Lazarus\UI01\HUDWeather\lib\x86_64-win64\HUDWeather.obj
 (9015) Linking F:\Claude\Lazarus\UI01\HUDWeather\HUDWeather.exe
-(1008) 21 lines compiled, 1.2 sec, 3153024 bytes code, 152580 bytes data
+(1008) 21 lines compiled, 1.3 sec, 3158752 bytes code, 152612 bytes data
 (1022) 3 hint(s) issued
