@@ -1,0 +1,17 @@
+object SciFiHUDForm: TSciFiHUDForm
+  Left = 300
+  Height = 864
+  Top = 40
+  Width = 666
+  Caption = 'Sci-Fi HUD Interface Kit  -  BGRABitmap'
+  ClientHeight = 864
+  ClientWidth = 666
+  Color = 1323022
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnPaint = FormPaint
+  OnResize = FormResize
+  Position = poScreenCenter
+end
