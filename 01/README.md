@@ -1,4 +1,4 @@
-# Sci-Fi HUD programs (Lazarus + BGRABitmap)
+# UI Sci-Fi programs (Lazarus + BGRABitmap)
 
 One program per UI from the original HUD kit. Every program opens a window
 with the live, animated UI on the left and a developer info panel on the right.
